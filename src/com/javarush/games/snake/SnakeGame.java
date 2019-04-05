@@ -1,32 +1,41 @@
 package com.javarush.games.snake;
 import com.javarush.engine.cell.*;
+import java.util.ArrayList;
+import java.util.List;
 
-public class SnakeGame extends Game{
+public class SnakeGame extends Game {
     public static final int WIDTH = 15;
     public static final int HEIGHT = 15;
-    private static final int GOAL = 28;
-    private Snake snake;
-    private Apple apple;
+    private static final int GOAL = 20;
+    private static List<Snake> snakes = new ArrayList<>();
+    private static List<Apple> apples = new ArrayList<>();
+    private Snake mySnake;
+    private AnotherSnake anotherSnake;
     private boolean isGameStopped;
     private int turnDelay = 0;
     private int score;
 
+
     @Override
     public void initialize() {
-    setScreenSize(WIDTH, HEIGHT);
-    createGame();
+        setScreenSize(WIDTH, HEIGHT);
+        createGame();
     }
 
     private  void createGame(){
-        snake = new Snake(WIDTH / 2, HEIGHT /2);
-        score = 0;
-        setScore(score);
-        createNewApple();
         isGameStopped = false;
+        score = 0;
+        snakes.clear();
+        apples.clear();
+        mySnake = new MySnake(WIDTH / 2, HEIGHT /2);
+        mySnake.direction = Direction.LEFT;
+        snakes.add(mySnake);
+        createNewApple();
         drawScene();
         turnDelay = 300;
         setTurnTimer(turnDelay);
     }
+
     private void gameOver(){
         stopTurnTimer();
         isGameStopped = true;
@@ -39,51 +48,93 @@ public class SnakeGame extends Game{
         showMessageDialog(Color.GREY,"Победа!!!",Color.GOLDENROD,75);
     }
 
-    private void createNewApple(){
-            apple = new Apple(getRandomNumber(WIDTH),getRandomNumber(HEIGHT));
-            if (snake.checkCollision(apple)) createNewApple();
-        }
+    public void createNewApple(){
+        Apple apple = new Apple(getRandomNumber(WIDTH),getRandomNumber(HEIGHT));
+        apples.add(apple);
+    }
 
     private void drawScene() {
-        for (int y = 0; y < HEIGHT; y++){
-            for(int x = 0; x < WIDTH; x++){
-                setCellValueEx(x,y, Color.DARKSEAGREEN,"");
+        for (int y = 0; y < HEIGHT; y++) {
+            for (int x = 0; x < WIDTH; x++) {
+                setCellValueEx(x, y, Color.DARKSEAGREEN, "");
             }
         }
-        apple.draw(this);
-        snake.draw(this);
+        for (Snake snake  : snakes) {
+            if (snake.isAlive)snake.draw(this);
+        }
+
+        for (Apple apple : apples) {
+            apple.draw(this);
+        }
+    }
+
+    private void moveSnakes(){
+
+        if (snakes.size() > 1){
+            for (int i = 1; i < snakes.size(); i++) {
+                snakes.get(i).move(apples);
+                if (!snakes.get(0).isAlive)isGameStopped = true;
+                if(apples.isEmpty()){
+                    score -= 1;
+                    setScore(score);
+                    createNewApple();
+                }
+            }
+        }
+        snakes.get(0).move(apples);
+
     }
 
     @Override
     public void onTurn(int step) {
-        snake.move(apple);
-        if (!apple.isAlive) {
-            createNewApple();
-            score +=5;
-            setScore(score);
-            turnDelay -=5;
-            setTurnTimer(turnDelay);
-
+        if (!isGameStopped) {
+            moveSnakes();
+            if (apples.size() == 0) {
+                createNewApple();
+                score += 5;
+                setScore(score);
+                turnDelay -= 2;
+                setTurnTimer(turnDelay);
+            }
+            if (!mySnake.isAlive) {
+                gameOver();
+            }
+            if (mySnake.getLength() > GOAL || score > 70) {
+                win();
+            }
+            if (score < 0) {
+                gameOver();
+            }
+            drawScene();
         }
-        if (!snake.isAlive) gameOver();
-        if (snake.getLength() > GOAL) win();
-        drawScene();
     }
 
     @Override
     public void onKeyPress(Key key) {
+        try {
 
-        switch (key){
-            case LEFT: snake.setDirection(Direction.LEFT);
-            break;
-            case RIGHT: snake.setDirection(Direction.RIGHT);
-            break;
-            case UP: snake.setDirection(Direction.UP);
-            break;
-            case DOWN: snake.setDirection(Direction.DOWN);
-            break;
-            case SPACE: if (isGameStopped) createGame();
-            break;
-        }
+            switch (key) {
+                case LEFT:
+                    mySnake.setDirection(Direction.LEFT);
+                    break;
+                case RIGHT:
+                    mySnake.setDirection(Direction.RIGHT);
+                    break;
+                case UP:
+                    mySnake.setDirection(Direction.UP);
+                    break;
+                case DOWN:
+                    mySnake.setDirection(Direction.DOWN);
+                    break;
+                case SPACE:
+                    if (isGameStopped) createGame();
+                    break;
+            }
+        }catch (Exception e){}
     }
+
+
+
+
+
 }

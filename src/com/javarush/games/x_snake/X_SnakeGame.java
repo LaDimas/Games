@@ -10,8 +10,8 @@ public class X_SnakeGame extends Game {
     public static final int WIDTH = 15;
     public static final int HEIGHT = 15;
     private static final int GOAL = 20;
-    public static List<Snake> snakes = new ArrayList<>();
-    public static List<Apple> apples = new ArrayList<>();
+    private static List<Snake> snakes = new ArrayList<>();
+    private static List<Apple> apples = new ArrayList<>();
     private Snake mySnake;
     private AnotherSnake anotherSnake;
     private boolean isGameStopped;
@@ -51,7 +51,7 @@ public class X_SnakeGame extends Game {
         showMessageDialog(Color.GREY,"Победа!!!",Color.GOLDENROD,75);
     }
 
-    public void createNewApple(){
+    private void createNewApple(){
         Apple apple = new Apple(getRandomNumber(WIDTH),getRandomNumber(HEIGHT));
         apples.add(apple);
     }
@@ -104,6 +104,9 @@ public class X_SnakeGame extends Game {
             }
             if (mySnake.getLength() > GOAL || score > 70) {
                 win();
+            }
+            if (score < 0) {
+                gameOver();
             }
             drawScene();
         }
