@@ -7,8 +7,8 @@ public class SnakeGame extends Game {
     public static final int WIDTH = 15;
     public static final int HEIGHT = 15;
     private static final int GOAL = 20;
-    private static List<Snake> snakes = new ArrayList<>();
-    private static List<Apple> apples = new ArrayList<>();
+    public static List<Snake> snakes = new ArrayList<>();
+    public static List<Apple> apples = new ArrayList<>();
     private Snake mySnake;
     private AnotherSnake anotherSnake;
     private boolean isGameStopped;
