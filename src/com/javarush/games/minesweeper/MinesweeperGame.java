@@ -121,7 +121,7 @@ public class MinesweeperGame extends Game {
                     if (gameField[y][x].countMineNeighbors == 0) {
                         setCellColor(x, y, Color.BEIGE);
                         setCellValue(x, y, "");
-
+                        score = score + 5;
                         List<GameObject> list = getNeighbors(gameField[y][x]);
                         for (int i = 0; i < list.size(); i++) {
                             if (!list.get(i).isOpen)
